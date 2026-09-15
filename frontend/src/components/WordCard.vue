@@ -1,8 +1,33 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { Morpheme, Word } from '@/types'
+import { computed, ref, watch } from 'vue'
+import wordService from '@/services/wordService'
+import type { Morpheme, Word, WordRelated } from '@/types'
 
 const props = defineProps<{ word: Word }>()
+
+// WordNet-derived extra data (synonyms / antonyms / phrases), fetched per
+// word id. Optional data: failures keep the card fully usable.
+const related = ref<WordRelated | null>(null)
+watch(
+  () => props.word.id,
+  async (id) => {
+    related.value = null
+    if (!id) return
+    try {
+      related.value = await wordService.getRelated(id)
+    } catch (err) {
+      console.warn('Failed to load related words:', err)
+    }
+  },
+  { immediate: true },
+)
+
+const POS_LABELS: Record<string, string> = { n: 'n.', v: 'v.', a: 'adj.', r: 'adv.' }
+
+function shortGloss(text: string | null, max = 22): string {
+  if (!text) return ''
+  return text.length > max ? text.slice(0, max) + '…' : text
+}
 
 type MorphemeType = 'prefix' | 'stem' | 'root' | 'suffix'
 
@@ -156,6 +181,33 @@ const breakdown = computed(() => {
         </li>
       </ul>
     </div>
+    <div v-if="related?.phrases?.length" class="section">
+      <div class="section-title"><span class="title-bar"></span>短语搭配</div>
+      <ul class="phrases">
+        <li v-for="p in related.phrases" :key="p.phrase">
+          <span class="pos" v-if="p.pos">{{ POS_LABELS[p.pos] ?? p.pos }}</span>
+          <span class="phrase-text">{{ p.phrase }}</span>
+          <span class="phrase-gloss">{{ p.gloss_cn || p.gloss_en }}</span>
+        </li>
+      </ul>
+    </div>
+    <div v-if="related?.synonyms?.length || related?.antonyms?.length" class="section">
+      <div class="section-title"><span class="title-bar"></span>同义词 / 反义词</div>
+      <div v-if="related?.synonyms?.length" class="rel-row">
+        <span class="rel-tag rel-syn">同</span>
+        <span v-for="s in related.synonyms" :key="'s-' + s.related_word" class="rel-chip">
+          <span class="rel-word">{{ s.related_word }}</span>
+          <span v-if="s.gloss_cn" class="rel-gloss">{{ shortGloss(s.gloss_cn) }}</span>
+        </span>
+      </div>
+      <div v-if="related?.antonyms?.length" class="rel-row">
+        <span class="rel-tag rel-ant">反</span>
+        <span v-for="a in related.antonyms" :key="'a-' + a.related_word" class="rel-chip">
+          <span class="rel-word">{{ a.related_word }}</span>
+          <span v-if="a.gloss_cn" class="rel-gloss">{{ shortGloss(a.gloss_cn) }}</span>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -186,4 +238,16 @@ const breakdown = computed(() => {
 .bd-suffix .bd-type { background: rgba(245, 158, 11, 0.14); color: #be185d; }
 .bd-text { font-family: 'SF Mono', Consolas, monospace; font-weight: 600; color: var(--lg-text-primary); min-width: 70px; }
 .bd-meaning { color: var(--lg-text-secondary); font-size: 13px; }
+.phrases { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.phrases li { display: flex; align-items: baseline; gap: 8px; padding: 7px 12px; border-radius: var(--lg-radius-md); background: rgba(255, 255, 255, 0.45); }
+.phrase-text { font-weight: 600; color: var(--lg-text-primary); font-size: 14px; white-space: nowrap; }
+.phrase-gloss { color: var(--lg-text-secondary); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rel-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.rel-row:last-child { margin-bottom: 0; }
+.rel-tag { flex-shrink: 0; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: 700; }
+.rel-syn { background: rgba(16, 185, 129, 0.14); color: #059669; }
+.rel-ant { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+.rel-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 12px; border-radius: var(--lg-radius-pill); background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(99, 102, 241, 0.12); }
+.rel-word { font-weight: 600; color: var(--lg-text-primary); font-size: 13px; }
+.rel-gloss { color: var(--lg-text-tertiary); font-size: 12px; }
 </style>

@@ -27,6 +27,26 @@ export interface Word {
   suffixes?: Morpheme[]
 }
 
+export interface WordRelation {
+  related_word: string
+  relation: string
+  pos: string | null
+  gloss_cn: string | null
+}
+
+export interface WordPhrase {
+  phrase: string
+  pos: string | null
+  gloss_cn: string | null
+  gloss_en: string | null
+}
+
+export interface WordRelated {
+  synonyms: WordRelation[]
+  antonyms: WordRelation[]
+  phrases: WordPhrase[]
+}
+
 export interface WordPage {
   total: number
   items: Word[]

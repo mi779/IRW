@@ -60,3 +60,30 @@ class WordPage(BaseModel):
     items: List[WordReadWithRelations]
     skip: int
     limit: int
+
+
+class WordRelationRead(BaseModel):
+    """One synonym/antonym entry (WordNet)."""
+    model_config = ConfigDict(from_attributes=True)
+
+    related_word: str
+    relation: str
+    pos: Optional[str] = None
+    gloss_cn: Optional[str] = None
+
+
+class WordPhraseRead(BaseModel):
+    """One phrase collocation (WordNet multi-word lemma)."""
+    model_config = ConfigDict(from_attributes=True)
+
+    phrase: str
+    pos: Optional[str] = None
+    gloss_cn: Optional[str] = None
+    gloss_en: Optional[str] = None
+
+
+class WordRelated(BaseModel):
+    """Extra dictionary data for the word-detail drawer."""
+    synonyms: List[WordRelationRead] = []
+    antonyms: List[WordRelationRead] = []
+    phrases: List[WordPhraseRead] = []

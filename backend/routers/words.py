@@ -7,10 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from models.morpheme import Prefix, Root, Suffix
 from models.word import Word
+from models.word_related import WordPhrase, WordRelation
 from schemas.word import (
     WordCreate,
     WordPage,
+    WordPhraseRead,
     WordReadWithRelations,
+    WordRelated,
+    WordRelationRead,
     WordUpdate,
 )
 
@@ -126,6 +130,39 @@ async def get_word(word_id: int, db: AsyncSession = Depends(get_db)):
     if word is None:
         raise HTTPException(status_code=404, detail="Word not found")
     return word
+
+
+@router.get("/{word_id}/related", response_model=WordRelated)
+async def get_word_related(word_id: int, db: AsyncSession = Depends(get_db)):
+    """Synonyms / antonyms / phrase collocations (WordNet 3.1) for the
+    word-detail drawer, ordered by sense frequency (most common first)."""
+    word = (await db.execute(select(Word.id).where(Word.id == word_id))).scalars().first()
+    if word is None:
+        raise HTTPException(status_code=404, detail="Word not found")
+
+    def rel_stmt(relation: str, limit: int):
+        return (
+            select(WordRelation)
+            .where(WordRelation.word_id == word_id, WordRelation.relation == relation)
+            .order_by(WordRelation.sense_rank, WordRelation.related_word)
+            .limit(limit)
+        )
+
+    synonyms = (await db.execute(rel_stmt("synonym", 12))).scalars().all()
+    antonyms = (await db.execute(rel_stmt("antonym", 6))).scalars().all()
+    phrases = (
+        await db.execute(
+            select(WordPhrase)
+            .where(WordPhrase.word_id == word_id)
+            .order_by(WordPhrase.sense_rank, WordPhrase.phrase)
+            .limit(12)
+        )
+    ).scalars().all()
+    return WordRelated(
+        synonyms=[WordRelationRead.model_validate(r) for r in synonyms],
+        antonyms=[WordRelationRead.model_validate(r) for r in antonyms],
+        phrases=[WordPhraseRead.model_validate(p) for p in phrases],
+    )
 
 
 @router.put("/{word_id}", response_model=WordReadWithRelations)
