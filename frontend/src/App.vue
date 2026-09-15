@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import request from '@/services/request'
 
 const router = useRouter()
 const route = useRoute()
+
+const appVersion = __APP_VERSION__
+const buildTime = __BUILD_TIME__
+const backendVersion = ref('')
+
+onMounted(async () => {
+  try {
+    const d = await request.get<unknown, { commit: string; started: string }>('/version')
+    backendVersion.value = `v${d.commit} · 启动 ${d.started}`
+  } catch {
+    backendVersion.value = ''
+  }
+})
 
 const navItems = [
   { path: '/', label: '首页', icon: '🏠' },
@@ -44,6 +58,11 @@ function navigate(path: string) { router.push(path) }
     <main class="app-main">
       <RouterView />
     </main>
+    <footer class="app-footer">
+      <span>前端 v{{ appVersion }} · 构建 {{ buildTime }}</span>
+      <span v-if="backendVersion" class="footer-sep">|</span>
+      <span v-if="backendVersion">后端 {{ backendVersion }}</span>
+    </footer>
   </div>
 </template>
 
@@ -89,4 +108,12 @@ function navigate(path: string) { router.push(path) }
 
 .nav-icon { font-size: 14px; }
 .app-main { padding-top: 28px; position: relative; z-index: 1; }
+
+.app-footer {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 32px; padding: 14px 0 6px; border-top: 1px dashed rgba(99, 102, 241, 0.12);
+  font-size: 11.5px; color: var(--lg-text-tertiary); opacity: 0.8;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.2px;
+}
+.footer-sep { opacity: 0.4; }
 </style>
