@@ -25,3 +25,6 @@ Thumbs.db
 
 # Build
 *.local
+
+# Large dictionary dumps (import separately, e.g. ECDICT csv)
+backend/data/

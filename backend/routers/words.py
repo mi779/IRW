@@ -1,13 +1,18 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from models.morpheme import Prefix, Root, Suffix
 from models.word import Word
-from schemas.word import WordCreate, WordRead, WordReadWithRelations, WordUpdate
+from schemas.word import (
+    WordCreate,
+    WordPage,
+    WordReadWithRelations,
+    WordUpdate,
+)
 
 router = APIRouter()
 
@@ -54,21 +59,54 @@ async def create_word(payload: WordCreate, db: AsyncSession = Depends(get_db)):
     return word
 
 
-@router.get("/", response_model=List[WordReadWithRelations])
-async def list_words(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Word))
-    return result.scalars().all()
+@router.get("/", response_model=WordPage)
+async def list_words(
+    search: str = Query("", max_length=100, description="Fuzzy match on spelling"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+):
+    """Paginated word list. The dictionary holds 770k+ entries, so the
+    response is always capped by `limit` (max 200)."""
+    stmt = select(Word).order_by(Word.spelling)
+    if search:
+        stmt = stmt.where(Word.spelling.like(f"%{search}%"))
+    total = (
+        await db.execute(select(func.count()).select_from(stmt.subquery()))
+    ).scalar_one()
+    items = (await db.execute(stmt.offset(skip).limit(limit))).scalars().all()
+    return WordPage(total=total, items=items, skip=skip, limit=limit)
 
 
 @router.get("/by-root/{root_id}", response_model=List[WordReadWithRelations])
-async def words_by_root(root_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Word).join(Word.roots).where(Root.id == root_id))
+async def words_by_root(
+    root_id: int,
+    limit: int = Query(200, ge=1, le=500),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Word)
+        .join(Word.roots)
+        .where(Root.id == root_id)
+        .order_by(func.coalesce(func.nullif(Word.frq, 0), 999999), Word.spelling)
+        .limit(limit)
+    )
     return result.scalars().all()
 
 
 @router.get("/by-prefix/{prefix_id}", response_model=List[WordReadWithRelations])
-async def words_by_prefix(prefix_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Word).join(Word.prefixes).where(Prefix.id == prefix_id))
+async def words_by_prefix(
+    prefix_id: int,
+    limit: int = Query(200, ge=1, le=500),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Word)
+        .join(Word.prefixes)
+        .where(Prefix.id == prefix_id)
+        .order_by(func.coalesce(func.nullif(Word.frq, 0), 999999), Word.spelling)
+        .limit(limit)
+    )
     return result.scalars().all()
 
 

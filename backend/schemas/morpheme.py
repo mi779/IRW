@@ -26,3 +26,5 @@ class MorphemeRead(BaseModel):
     text: str
     meaning: Optional[str] = None
     description: Optional[str] = None
+    # Word count is attached by the list endpoints (not a DB column).
+    word_count: Optional[int] = None

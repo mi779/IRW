@@ -33,7 +33,7 @@ async def apply_review(
         prev_repetitions=prev_repetitions,
     )
 
-    now = datetime.utcnow()
+    now = datetime.now()
     log = ReviewLog(
         word_id=word_id,
         review_date=now,
@@ -64,7 +64,7 @@ async def get_due_queue(db: AsyncSession, limit: int = 20) -> List[ReviewLog]:
         .subquery()
     )
 
-    now = datetime.utcnow()
+    now = datetime.now()
     stmt = (
         select(ReviewLog, Word.spelling)
         .join(latest_dates, ReviewLog.word_id == latest_dates.c.word_id)

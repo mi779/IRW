@@ -1,8 +1,15 @@
 import request from './request'
-import type { Word } from '@/types'
+import type { Word, WordPage } from '@/types'
+
+export interface WordPageParams {
+  search?: string
+  skip?: number
+  limit?: number
+}
 
 export default {
-  getAll: () => request.get<unknown, Word[]>('/words'),
+  getPage: (params: WordPageParams) =>
+    request.get<unknown, WordPage>('/words', { params }),
   getById: (id: number) => request.get<unknown, Word>(`/words/${id}`),
   getByRoot: (rootId: number) => request.get<unknown, Word[]>(`/words/by-root/${rootId}`),
   getByPrefix: (prefixId: number) =>

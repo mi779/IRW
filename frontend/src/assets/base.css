@@ -1,53 +1,58 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/* ============================================================
+   Liquid Glass Theme - 液态玻璃浅色版
+   ============================================================ */
+
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
+  /* ---- 主色板 (Liquid Glass 5 colors) ---- */
+  --lg-blue: #5b6cff;
+  --lg-pink: #f472b6;
+  --lg-cyan: #22d3ee;
+  --lg-purple: #a78bfa;
+  --lg-yellow: #fbbf24;
 
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
+  /* ---- 渐变 ---- */
+  --lg-gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  --lg-gradient-soft: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+  --lg-gradient-bg: linear-gradient(160deg, #eef2ff 0%, #f5f3ff 40%, #fdf2f8 100%);
 
-  --vt-c-indigo: #2c3e50;
+  /* ---- 毛玻璃面板 ---- */
+  --lg-glass-bg: rgba(255, 255, 255, 0.65);
+  --lg-glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --lg-glass-bg-weak: rgba(255, 255, 255, 0.45);
+  --lg-glass-blur: 18px;
+  --lg-glass-border: 1px solid rgba(255, 255, 255, 0.6);
+  --lg-glass-border-subtle: 1px solid rgba(99, 102, 241, 0.08);
+  --lg-glass-shadow: 0 8px 32px rgba(99, 102, 241, 0.08),
+                     0 2px 8px rgba(99, 102, 241, 0.04);
+  --lg-glass-shadow-hover: 0 12px 40px rgba(99, 102, 241, 0.14),
+                           0 4px 12px rgba(99, 102, 241, 0.06);
 
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+  /* ---- 圆角 ---- */
+  --lg-radius-xs: 8px;
+  --lg-radius-sm: 12px;
+  --lg-radius-md: 16px;
+  --lg-radius-lg: 20px;
+  --lg-radius-xl: 24px;
+  --lg-radius-pill: 999px;
 
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
-}
+  /* ---- 语义文字 ---- */
+  --lg-text-primary: #1e1b4b;
+  --lg-text-secondary: #4b5563;
+  --lg-text-tertiary: #9ca3af;
+  --lg-text-inverse: #ffffff;
 
-/* semantic color variables for this project */
-:root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
+  /* ---- 语义状态 ---- */
+  --lg-success: #10b981;
+  --lg-warning: #f59e0b;
+  --lg-danger: #ef4444;
+  --lg-info: #6366f1;
 
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
-
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
-
-  --section-gap: 160px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
+  /* ---- 间距 ---- */
+  --lg-space-xs: 4px;
+  --lg-space-sm: 8px;
+  --lg-space-md: 16px;
+  --lg-space-lg: 24px;
+  --lg-space-xl: 32px;
 }
 
 *,
@@ -58,29 +63,106 @@
   font-weight: normal;
 }
 
+html { scroll-behavior: smooth; }
+
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
+  color: var(--lg-text-primary);
+  background: var(--lg-gradient-bg);
+  background-attachment: fixed;
   line-height: 1.6;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   font-size: 15px;
+  font-feature-settings: 'cv11', 'ss01';
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+  opacity: 0.55;
+}
+
+body::before {
+  width: 420px; height: 420px;
+  top: -120px; left: -120px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%);
+}
+
+body::after {
+  width: 480px; height: 480px;
+  bottom: -160px; right: -120px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.28) 0%, transparent 70%);
+}
+
+.lg-glass {
+  background: var(--lg-glass-bg);
+  backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--lg-glass-blur)) saturate(1.6);
+  border: var(--lg-glass-border);
+  border-radius: var(--lg-radius-lg);
+  box-shadow: var(--lg-glass-shadow);
+}
+
+.lg-glass-strong {
+  background: var(--lg-glass-bg-strong);
+  backdrop-filter: blur(calc(var(--lg-glass-blur) + 4px)) saturate(1.8);
+  -webkit-backdrop-filter: blur(calc(var(--lg-glass-blur) + 4px)) saturate(1.8);
+  border: var(--lg-glass-border);
+  border-radius: var(--lg-radius-lg);
+  box-shadow: var(--lg-glass-shadow);
+}
+
+.lg-glass-weak {
+  background: var(--lg-glass-bg-weak);
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  border: var(--lg-glass-border-subtle);
+  border-radius: var(--lg-radius-md);
+}
+
+.lg-hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.lg-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--lg-glass-shadow-hover);
+}
+
+.lg-gradient-text {
+  background: var(--lg-gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Element Plus 变量覆盖 */
+:root {
+  --el-color-primary: #6366f1;
+  --el-color-primary-light-3: #818cf8;
+  --el-color-primary-light-5: #a5b4fc;
+  --el-color-primary-light-7: #c7d2fe;
+  --el-color-primary-light-8: #ddd6fe;
+  --el-color-primary-light-9: #ede9fe;
+  --el-color-primary-dark-2: #4f46e5;
+  --el-color-success: #10b981;
+  --el-color-warning: #f59e0b;
+  --el-color-danger: #ef4444;
+  --el-color-error: #ef4444;
+  --el-color-info: #6b7280;
+  --el-text-color-primary: var(--lg-text-primary);
+  --el-text-color-regular: var(--lg-text-secondary);
+  --el-text-color-secondary: var(--lg-text-tertiary);
+  --el-border-radius-base: var(--lg-radius-sm);
+  --el-border-radius-small: var(--lg-radius-xs);
+  --el-font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
 }

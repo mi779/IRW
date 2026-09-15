@@ -8,6 +8,7 @@ export interface Morpheme {
   text: string
   meaning: string | null
   description: string | null
+  word_count?: number | null
 }
 
 export interface Word {
@@ -16,11 +17,21 @@ export interface Word {
   phonetics: Record<string, string> | null
   definitions: Definition[] | null
   part_of_speech: string | null
+  tags: string[] | null
+  bnc?: number | null
+  frq?: number | null
   example_sentences: string[] | null
   created_at: string
   roots?: Morpheme[]
   prefixes?: Morpheme[]
   suffixes?: Morpheme[]
+}
+
+export interface WordPage {
+  total: number
+  items: Word[]
+  skip: number
+  limit: number
 }
 
 export interface ReviewQueueItem {

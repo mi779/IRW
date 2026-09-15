@@ -16,6 +16,9 @@ class Word(TimestampMixin, Base):
     phonetics: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     definitions: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
     part_of_speech: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    tags: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    bnc: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    frq: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     example_sentences: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
 
     roots: Mapped[List["Root"]] = relationship(
@@ -28,8 +31,10 @@ class Word(TimestampMixin, Base):
         secondary=word_suffix, lazy="selectin", back_populates="words"
     )
 
+    # noload: review queries go through ReviewLog directly; eager-loading
+    # logs for every fetched word ballooned word queries unnecessarily.
     review_logs: Mapped[List["ReviewLog"]] = relationship(
-        back_populates="word", lazy="selectin"
+        back_populates="word", lazy="noload"
     )
 
 

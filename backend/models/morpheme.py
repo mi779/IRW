@@ -16,8 +16,15 @@ class Root(TimestampMixin, Base):
     meaning: Mapped[str | None] = mapped_column(String(200), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    # Non-column attribute; set by list endpoints for API serialization.
+    word_count = None
+
+    # noload: never eager-load linked words. With 770k words / 300k links,
+    # selectin here cascaded into loading huge swaths of the dictionary on
+    # every morpheme query and timed out API requests. All endpoints that
+    # need morpheme-word joins query from the Word side instead.
     words: Mapped[List["Word"]] = relationship(
-        secondary=word_root, lazy="selectin", back_populates="roots"
+        secondary=word_root, lazy="noload", back_populates="roots"
     )
 
 
@@ -29,8 +36,10 @@ class Prefix(TimestampMixin, Base):
     meaning: Mapped[str | None] = mapped_column(String(200), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    word_count = None
+
     words: Mapped[List["Word"]] = relationship(
-        secondary=word_prefix, lazy="selectin", back_populates="prefixes"
+        secondary=word_prefix, lazy="noload", back_populates="prefixes"
     )
 
 
@@ -42,8 +51,10 @@ class Suffix(TimestampMixin, Base):
     meaning: Mapped[str | None] = mapped_column(String(200), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    word_count = None
+
     words: Mapped[List["Word"]] = relationship(
-        secondary=word_suffix, lazy="selectin", back_populates="suffixes"
+        secondary=word_suffix, lazy="noload", back_populates="suffixes"
     )
 
 

@@ -1,14 +1,36 @@
 from typing import List, Type
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from models.associations import word_prefix, word_root, word_suffix
 from models.morpheme import Prefix, Root, Suffix
 from schemas.morpheme import MorphemeCreate, MorphemeRead, MorphemeUpdate
 
 router = APIRouter()
+
+# model -> association table, used to compute word counts for list endpoints.
+_ASSOCIATION_TABLES: dict = {
+    Root: word_root,
+    Prefix: word_prefix,
+    Suffix: word_suffix,
+}
+
+
+async def _attach_word_counts(db: AsyncSession, model: Type, items: list) -> None:
+    """Attach word_count to each morpheme instance for serialization."""
+    assoc = _ASSOCIATION_TABLES[model]
+    counts = dict(
+        (await db.execute(
+            select(assoc.c.morpheme_id, func.count(assoc.c.word_id)).group_by(
+                assoc.c.morpheme_id
+            )
+        )).all()
+    )
+    for item in items:
+        item.word_count = counts.get(item.id, 0)  # type: ignore[attr-defined]
 
 
 def _build_subrouter(model: Type, prefix: str) -> APIRouter:
@@ -17,7 +39,9 @@ def _build_subrouter(model: Type, prefix: str) -> APIRouter:
     @sub.get("/", response_model=List[MorphemeRead])
     async def list_items(db: AsyncSession = Depends(get_db)):
         result = await db.execute(select(model))
-        return result.scalars().all()
+        items = result.scalars().all()
+        await _attach_word_counts(db, model, items)
+        return items
 
     @sub.get("/{item_id}", response_model=MorphemeRead)
     async def get_item(item_id: int, db: AsyncSession = Depends(get_db)):
