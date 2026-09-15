@@ -39,6 +39,7 @@ class WordRead(BaseModel):
     id: int
     spelling: str
     phonetics: Optional[dict] = None
+    transliteration: Optional[str] = None
     definitions: Optional[list] = None
     part_of_speech: Optional[str] = None
     tags: Optional[List[str]] = None

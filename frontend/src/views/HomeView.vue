@@ -2,7 +2,8 @@
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const cards = [
-  { title: '单词管理', description: '维护单词库，添加、编辑或删除单词及其释义、词根、前后缀等信息。', route: '/words', icon: '📖', accent: 'linear-gradient(135deg, #6366f1, #8b5cf6)' },
+  { title: '单词管理', description: '欧路词典 77 万词库：单词、音标、中文含义与音译一览，支持分页与模糊查询。', route: '/words', icon: '📖', accent: 'linear-gradient(135deg, #6366f1, #8b5cf6)' },
+  { title: '词缀大纲', description: '维护词条的词根、前缀、后缀拆解，构建你的构词大纲。', route: '/affixes', icon: '🧩', accent: 'linear-gradient(135deg, #0ea5e9, #6366f1)' },
   { title: '词根分组学习', description: '通过词根关系图可视化地学习一组同根单词，加速记忆。', route: '/roots', icon: '🌳', accent: 'linear-gradient(135deg, #f59e0b, #ec4899)' },
   { title: '复习', description: '基于间隔重复（SRS）的复习队列，巩固长期记忆。', route: '/review', icon: '🎯', accent: 'linear-gradient(135deg, #10b981, #22d3ee)' },
 ]
