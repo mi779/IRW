@@ -58,7 +58,7 @@ function buildGraph() {
           lineWidth: isWord ? 1.5 : 2,
           shadowBlur: isWord ? 8 : 14,
           shadowColor: isWord ? 'rgba(99, 102, 241, 0.25)' : 'rgba(245, 158, 11, 0.3)',
-          labelText: d.label,
+          labelText: String(d.label ?? ''),
           labelFill: isWord ? '#1e1b4b' : '#78350f',
           labelFontSize: isWord ? 13 : 15,
           labelFontWeight: isWord ? 500 : 700,

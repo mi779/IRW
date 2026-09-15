@@ -1,5 +1,5 @@
 import request from './request'
-import type { Morpheme, GraphData } from '@/types'
+import type { Morpheme, GraphData, WordPage } from '@/types'
 
 export default {
   // Roots
@@ -27,7 +27,14 @@ export default {
   deleteSuffix: (id: number) => request.delete(`/suffixes/${id}`),
 
   // Graph
-  getRootGraph: (id: number) => request.get<unknown, GraphData>(`/graph/root/${id}`),
+  getRootGraph: (id: number, limit = 60) =>
+    request.get<unknown, GraphData>(`/graph/root/${id}`, { params: { limit } }),
   getPrefixGraph: (id: number) => request.get<unknown, GraphData>(`/graph/prefix/${id}`),
   getSuffixGraph: (id: number) => request.get<unknown, GraphData>(`/graph/suffix/${id}`),
+
+  // Paginated words linked to a root (most frequent first)
+  getRootWords: (
+    rootId: number,
+    params: { skip?: number; limit?: number; search?: string },
+  ) => request.get<unknown, WordPage>(`/words/by-root/${rootId}`, { params }),
 }

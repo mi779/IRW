@@ -78,20 +78,30 @@ async def list_words(
     return WordPage(total=total, items=items, skip=skip, limit=limit)
 
 
-@router.get("/by-root/{root_id}", response_model=List[WordReadWithRelations])
+@router.get("/by-root/{root_id}", response_model=WordPage)
 async def words_by_root(
     root_id: int,
-    limit: int = Query(200, ge=1, le=500),
+    search: str = Query("", max_length=100, description="Fuzzy match on spelling"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
+    """Paginated words linked to a root, most frequent first. Some roots
+    have thousands of linked words, so the response is always capped by
+    `limit` (max 200) and supports spelling search for quick lookup."""
+    stmt = (
         select(Word)
         .join(Word.roots)
         .where(Root.id == root_id)
         .order_by(func.coalesce(func.nullif(Word.frq, 0), 999999), Word.spelling)
-        .limit(limit)
     )
-    return result.scalars().all()
+    if search:
+        stmt = stmt.where(Word.spelling.like(f"%{search}%"))
+    total = (
+        await db.execute(select(func.count()).select_from(stmt.subquery()))
+    ).scalar_one()
+    items = (await db.execute(stmt.offset(skip).limit(limit))).scalars().all()
+    return WordPage(total=total, items=items, skip=skip, limit=limit)
 
 
 @router.get("/by-prefix/{prefix_id}", response_model=List[WordReadWithRelations])

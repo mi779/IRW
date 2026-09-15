@@ -1,13 +1,15 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import morphemeService from '@/services/morphemeService'
-import type { Morpheme, GraphData } from '@/types'
+import type { Morpheme, GraphData, WordPage } from '@/types'
 
 export const useMorphemeStore = defineStore('morpheme', () => {
   const roots = ref<Morpheme[]>([])
   const prefixes = ref<Morpheme[]>([])
   const suffixes = ref<Morpheme[]>([])
   const graphData = ref<GraphData | null>(null)
+  const rootWords = ref<WordPage | null>(null)
+  const rootWordsLoading = ref(false)
   const loading = ref(false)
 
   async function fetchRoots() {
@@ -82,12 +84,24 @@ export const useMorphemeStore = defineStore('morpheme', () => {
     await fetchSuffixes()
   }
 
-  async function fetchRootGraph(id: number) {
+  async function fetchRootGraph(id: number, limit = 60) {
     loading.value = true
     try {
-      graphData.value = await morphemeService.getRootGraph(id)
+      graphData.value = await morphemeService.getRootGraph(id, limit)
     } finally {
       loading.value = false
+    }
+  }
+
+  async function fetchRootWords(
+    rootId: number,
+    opts: { skip?: number; limit?: number; search?: string } = {},
+  ) {
+    rootWordsLoading.value = true
+    try {
+      rootWords.value = await morphemeService.getRootWords(rootId, opts)
+    } finally {
+      rootWordsLoading.value = false
     }
   }
 
@@ -114,6 +128,8 @@ export const useMorphemeStore = defineStore('morpheme', () => {
     prefixes,
     suffixes,
     graphData,
+    rootWords,
+    rootWordsLoading,
     loading,
     fetchRoots,
     createRoot,
@@ -128,6 +144,7 @@ export const useMorphemeStore = defineStore('morpheme', () => {
     updateSuffix,
     deleteSuffix,
     fetchRootGraph,
+    fetchRootWords,
     fetchPrefixGraph,
     fetchSuffixGraph,
   }
