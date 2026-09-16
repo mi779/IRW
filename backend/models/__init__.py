@@ -1,4 +1,5 @@
 from core.database import Base
+from models.data_source import PipelineSource, WordEtymology, WordForm
 from models.morpheme import Prefix, Root, Suffix
 from models.review import ReviewLog
 from models.user import User
@@ -15,4 +16,7 @@ __all__ = [
     "User",
     "WordRelation",
     "WordPhrase",
+    "WordForm",
+    "WordEtymology",
+    "PipelineSource",
 ]

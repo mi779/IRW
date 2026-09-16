@@ -13,6 +13,7 @@ class WordBase(BaseModel):
     part_of_speech: Optional[str] = None
     tags: Optional[List[str]] = None
     example_sentences: Optional[list] = None
+    category: Optional[str] = None
 
 
 class WordCreate(WordBase):
@@ -28,6 +29,7 @@ class WordUpdate(BaseModel):
     part_of_speech: Optional[str] = None
     tags: Optional[List[str]] = None
     example_sentences: Optional[list] = None
+    category: Optional[str] = None
     root_ids: Optional[List[int]] = None
     prefix_ids: Optional[List[int]] = None
     suffix_ids: Optional[List[int]] = None
@@ -46,6 +48,7 @@ class WordRead(BaseModel):
     bnc: Optional[int] = None
     frq: Optional[int] = None
     example_sentences: Optional[list] = None
+    category: Optional[str] = None
     created_at: datetime
 
 

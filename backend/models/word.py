@@ -21,6 +21,9 @@ class Word(TimestampMixin, Base):
     bnc: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     frq: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     example_sentences: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    # 词条类别(来自 Wiktionary/Kaikki 解析): lemma/inflection/phrase/proper_noun/
+    # abbreviation/symbol/archaic/rare/morpheme, 见 pipeline/parse_kaikki.py
+    category: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
     roots: Mapped[List["Root"]] = relationship(
         secondary=word_root, lazy="selectin", back_populates="words"
