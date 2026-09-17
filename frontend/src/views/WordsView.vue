@@ -25,10 +25,10 @@ function formatRoots(word: Word): string { if (!word.roots?.length) return '-'; 
   <div class="words-view">
     <div class="page-header">
       <div class="header-left">
-        <div class="page-icon">🧩</div>
+        <div class="page-icon">📚</div>
         <div>
-          <h2 class="page-title">词缀大纲</h2>
-          <p class="page-desc">词根 / 前缀 / 后缀拆解与词条管理</p>
+          <h2 class="page-title">单词管理</h2>
+          <p class="page-desc">管理你的词汇库</p>
         </div>
       </div>
       <div class="header-actions">

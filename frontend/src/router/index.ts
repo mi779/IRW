@@ -20,11 +20,6 @@ const router = createRouter({
     {
       path: '/words',
       name: 'words',
-      component: () => import('@/views/DictWordsView.vue'),
-    },
-    {
-      path: '/affixes',
-      name: 'affixes',
       component: () => import('@/views/WordsView.vue'),
     },
     {

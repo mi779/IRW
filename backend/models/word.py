@@ -14,7 +14,6 @@ class Word(TimestampMixin, Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     spelling: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     phonetics: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    transliteration: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     definitions: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
     part_of_speech: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     tags: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)

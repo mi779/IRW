@@ -21,8 +21,7 @@ onMounted(async () => {
 
 const navItems = [
   { path: '/', label: '首页', icon: '🏠' },
-  { path: '/words', label: '单词管理', icon: '📖' },
-  { path: '/affixes', label: '词缀大纲', icon: '🧩' },
+  { path: '/words', label: '单词管理', icon: '📚' },
   { path: '/roots', label: '词根分组', icon: '🌳' },
   { path: '/review', label: '复习', icon: '🎯' },
 ]

@@ -15,7 +15,6 @@ export interface Word {
   id: number
   spelling: string
   phonetics: Record<string, string> | null
-  transliteration: string | null
   definitions: Definition[] | null
   part_of_speech: string | null
   tags: string[] | null
