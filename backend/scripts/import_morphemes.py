@@ -305,30 +305,25 @@ async def backfill_frequency() -> None:
         return int(v) if v.isdigit() else None
 
     batch, total = [], 0
-
-    async def flush():
-        # one short transaction per batch: avoids lock-table overflow on 770k rows
-        nonlocal batch, total
-        if batch:
-            async with engine.begin() as conn:
-                await conn.execute(upsert, batch)
-            total += len(batch)
-            batch = []
-
     with open(CSV_PATH, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            params = {
-                "spelling": (row.get("word") or "").strip(),
-                "bnc": to_int(row.get("bnc")),
-                "frq": to_int(row.get("frq")),
-            }
-            if not params["spelling"]:
-                continue
-            batch.append(params)
-            if len(batch) >= BATCH_SIZE:
-                await flush()
-        await flush()
+        async with engine.begin() as conn:
+            for row in reader:
+                params = {
+                    "spelling": (row.get("word") or "").strip(),
+                    "bnc": to_int(row.get("bnc")),
+                    "frq": to_int(row.get("frq")),
+                }
+                if not params["spelling"]:
+                    continue
+                batch.append(params)
+                if len(batch) >= BATCH_SIZE:
+                    await conn.execute(upsert, batch)
+                    total += len(batch)
+                    batch = []
+            if batch:
+                await conn.execute(upsert, batch)
+                total += len(batch)
     print(f"Frequency backfill done: {total} rows", flush=True)
 
 

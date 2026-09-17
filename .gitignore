@@ -28,6 +28,3 @@ Thumbs.db
 
 # Large dictionary dumps (import separately, e.g. ECDICT csv)
 backend/data/
-
-# Local validation MySQL (pipeline small-batch testing)
-.local-mysql/
